@@ -79,7 +79,6 @@ export const IssueList = styled.ul`
           }
         }
         span {
-          background-color: #${props => console.log(props)};
           color: #333;
           border-radius: 3px;
           font-size: 12px;

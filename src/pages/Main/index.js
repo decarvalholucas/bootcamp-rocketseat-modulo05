@@ -14,6 +14,7 @@ export default class Main extends Component {
     newRepo: '',
     repositories: [],
     loading: false,
+    inputBorderColor: '#EEE',
   };
 
   // Load data from localStorage
@@ -36,15 +37,34 @@ export default class Main extends Component {
     event.preventDefault();
     this.setState({ loading: true });
     const { newRepo, repositories } = this.state;
-    const response = await api.get(`/repos/${newRepo}`);
-    const data = {
-      name: response.data.full_name,
-    };
-    this.setState({
-      repositories: [...repositories, data],
-      newRepo: '',
-      loading: false,
-    });
+    try {
+      const response = await api.get(`/repos/${newRepo}`);
+      const data = {
+        name: response.data.full_name,
+      };
+      const repoDuplicate = repositories.filter(
+        repository => repository.name === response.data.full_name
+      );
+
+      if (repoDuplicate) {
+        throw new Error('Repositório duplicado');
+      }
+
+      this.setState({
+        repositories: [...repositories, data],
+        newRepo: '',
+        loading: false,
+        inputBorderColor: '#eee',
+      });
+    } catch (error) {
+      this.setState({
+        repositories: [...repositories],
+        newRepo: '',
+        loading: false,
+        inputBorderColor: '#FF0000',
+      });
+      console.error(error);
+    }
   };
 
   handleInputChange = event => {
@@ -52,21 +72,21 @@ export default class Main extends Component {
   };
 
   render() {
-    const { newRepo, repositories, loading } = this.state;
+    const { newRepo, repositories, loading, inputBorderColor } = this.state;
     return (
       <Container>
         <h1>
           <FaGithubAlt />
           Repositórios
         </h1>
-        <Form onSubmit={this.handleSubmit}>
+        <Form onSubmit={this.handleSubmit} inputBorderColor={inputBorderColor}>
           <input
             type="text"
             placeholder="Adicionar repositório"
             value={newRepo}
             onChange={this.handleInputChange}
           />
-          <SubmitButton loading={loading}>
+          <SubmitButton loading={loading ? 1 : 0}>
             {loading ? (
               <FaSpinner color="#fff" size={14} />
             ) : (
