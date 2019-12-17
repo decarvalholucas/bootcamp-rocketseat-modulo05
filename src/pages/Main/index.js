@@ -46,7 +46,7 @@ export default class Main extends Component {
         repository => repository.name === response.data.full_name
       );
 
-      if (repoDuplicate) {
+      if (repoDuplicate.length > 0) {
         throw new Error('Repositório duplicado');
       }
 

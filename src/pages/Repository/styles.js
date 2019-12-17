@@ -45,16 +45,23 @@ export const Owner = styled.header`
 `;
 
 export const IssueList = styled.ul`
-  padding-top: 30px;
-  margin-top: 30px;
+  padding-top: 20px;
+  margin-top: 20px;
   border-top: 1px solid #eee;
   list-style: none;
+  select {
+    background: none;
+    border: 1px solid #eee;
+    padding: 10px;
+    margin: 0 0 20px 0;
+    width: 100%;
+    max-width: 200px;
+  }
   li {
     display: flex;
     padding: 15px 10px;
     border: 1px solid #eee;
     border-radius: 4px;
-
     & + li {
       margin-top: 10px;
     }

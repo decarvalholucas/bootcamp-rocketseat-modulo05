@@ -6,6 +6,7 @@ import api from '../../services/api';
 
 import { Loading, Owner, IssueList } from './styles';
 import Container from '../../components/Container';
+import Paginator from '../../components/Paginator';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -20,18 +21,21 @@ export default class Repository extends Component {
     repository: {},
     issues: [],
     loading: true,
+    filter: 'all',
+    page: 1,
   };
 
   async componentDidMount() {
     const { match } = this.props;
     const repoName = decodeURIComponent(match.params.repository);
-
+    const { filter, page } = this.state;
     const [repository, issues] = await Promise.all([
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
-          state: 'open',
+          state: filter,
           per_page: 5,
+          page,
         },
       }),
     ]);
@@ -42,8 +46,36 @@ export default class Repository extends Component {
     });
   }
 
+  loadIssues = async () => {
+    const { match } = this.props;
+    const { filter, page } = this.state;
+    const repoName = decodeURIComponent(match.params.repository);
+    const response = await api.get(`/repos/${repoName}/issues`, {
+      params: {
+        state: filter,
+        per_page: 5,
+        page,
+      },
+    });
+    this.setState({ issues: response.data });
+  };
+
+  updateRepoState = async filter => {
+    this.setState({
+      filter,
+    });
+    this.loadIssues();
+  };
+
+  pagination = async page => {
+    this.setState({
+      page,
+    });
+    this.loadIssues();
+  };
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, filter, page } = this.state;
 
     if (loading) {
       return (
@@ -64,12 +96,27 @@ export default class Repository extends Component {
           <p>{repository.description}</p>
         </Owner>
         <IssueList>
+          <select
+            value={filter}
+            onChange={event => this.updateRepoState(event.target.value)}
+          >
+            <option value="all">Todos</option>
+            <option value="open">Abertos</option>
+            <option value="closed">Fechados</option>
+          </select>
+          <Paginator page={page || 0}>
+            <button type="button">Anterior</button>
+            <button type="button">Proxima</button>
+            <span>{page}</span>
+          </Paginator>
           {issues.map(issue => (
             <li key={String(issue.id)}>
               <img src={issue.user.avatar_url} alt={issue.user.login} />
               <div>
                 <strong>
-                  <a href={issue.html_url}>{issue.title}</a>
+                  <a href={issue.html_url} target="__blank">
+                    {issue.title}
+                  </a>
                   {issue.labels.map(label => (
                     <span
                       style={{ backgroundColor: `#${label.color}` }}
@@ -84,6 +131,11 @@ export default class Repository extends Component {
             </li>
           ))}
         </IssueList>
+        <Paginator page={page || 0}>
+          <button type="button">Anterior</button>
+          <button type="button">Proxima</button>
+          <span>{page}</span>
+        </Paginator>
       </Container>
     );
   }
