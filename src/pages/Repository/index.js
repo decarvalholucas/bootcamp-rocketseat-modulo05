@@ -4,9 +4,8 @@ import { Link } from 'react-router-dom';
 import { FaArrowAltCircleLeft } from 'react-icons/fa';
 import api from '../../services/api';
 
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, IssueList, Filters, Pagination } from './styles';
 import Container from '../../components/Container';
-import Paginator from '../../components/Paginator';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -96,19 +95,22 @@ export default class Repository extends Component {
           <p>{repository.description}</p>
         </Owner>
         <IssueList>
-          <select
-            value={filter}
-            onChange={event => this.updateRepoState(event.target.value)}
-          >
-            <option value="all">Todos</option>
-            <option value="open">Abertos</option>
-            <option value="closed">Fechados</option>
-          </select>
-          <Paginator page={page || 0}>
-            <button type="button">Anterior</button>
-            <button type="button">Proxima</button>
-            <span>{page}</span>
-          </Paginator>
+          <Filters>
+            <select
+              value={filter}
+              onChange={event => this.updateRepoState(event.target.value)}
+            >
+              <option value="all">Todos</option>
+              <option value="open">Abertos</option>
+              <option value="closed">Fechados</option>
+            </select>
+            <Pagination>
+              <button type="button" disabled={page <= 1}>
+                Anterior
+              </button>
+              <button type="button">Proximo</button>
+            </Pagination>
+          </Filters>
           {issues.map(issue => (
             <li key={String(issue.id)}>
               <img src={issue.user.avatar_url} alt={issue.user.login} />
@@ -131,11 +133,6 @@ export default class Repository extends Component {
             </li>
           ))}
         </IssueList>
-        <Paginator page={page || 0}>
-          <button type="button">Anterior</button>
-          <button type="button">Proxima</button>
-          <span>{page}</span>
-        </Paginator>
       </Container>
     );
   }
