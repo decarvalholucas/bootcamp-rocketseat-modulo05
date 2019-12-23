@@ -56,6 +56,7 @@ export default class Repository extends Component {
         page,
       },
     });
+    console.log(this.state);
     this.setState({ issues: response.data });
   };
 
@@ -66,9 +67,18 @@ export default class Repository extends Component {
     this.loadIssues();
   };
 
-  pagination = async page => {
+  paginationNext = async () => {
+    const { page } = this.state;
     this.setState({
-      page,
+      page: page + 1,
+    });
+    this.loadIssues();
+  };
+
+  paginationPrevious = async () => {
+    const { page } = this.state;
+    this.setState({
+      page: page - 1,
     });
     this.loadIssues();
   };
@@ -105,10 +115,17 @@ export default class Repository extends Component {
               <option value="closed">Fechados</option>
             </select>
             <Pagination>
-              <button type="button" disabled={page <= 1}>
+              <span>{page}</span>
+              <button
+                type="button"
+                disabled={page <= 1}
+                onClick={this.paginationPrevious}
+              >
                 Anterior
               </button>
-              <button type="button">Proximo</button>
+              <button type="button" onClick={this.paginationNext}>
+                Proximo
+              </button>
             </Pagination>
           </Filters>
           {issues.map(issue => (

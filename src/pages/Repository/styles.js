@@ -127,4 +127,14 @@ export const Pagination = styled.div`
       opacity: 0.6;
     }
   }
+  span {
+    border: 1px solid #eee;
+    /* padding: 10px; */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
 `;
